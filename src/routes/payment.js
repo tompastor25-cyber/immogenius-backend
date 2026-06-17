@@ -4,7 +4,7 @@ import express from 'express';
 import Stripe from 'stripe';
 import { authenticateToken } from '../middleware/auth.js';
 import * as stripeService from '../services/stripe.js';
-import  prisma  from '../utils/db.js';
+import prisma from "../utils/db.js";
 
 const router = express.Router();
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
