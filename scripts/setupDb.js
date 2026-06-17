@@ -4,7 +4,7 @@
  */
 
 import dotenv from 'dotenv';
-import { prisma } from '../src/utils/db.js';
+import prisma from "../utils/db.js";
 import bcrypt from 'bcryptjs';
 
 dotenv.config();
