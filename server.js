@@ -19,7 +19,7 @@ import contentRouter from './src/routes/content.js';
 import paymentRouter from './src/routes/payment.js';
 
 // Utils
-import { prisma } from './src/utils/db.js';
+import prisma from "../utils/db.js";
 
 // Configuration
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
