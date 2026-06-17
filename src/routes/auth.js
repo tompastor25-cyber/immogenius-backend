@@ -2,7 +2,7 @@
 
 import express from 'express';
 import bcrypt from 'bcryptjs';
-import { prisma } from '../utils/db.js';
+import  prisma  from '../utils/db.js';
 import { generateToken } from '../utils/jwt.js';
 import { authenticateToken } from '../middleware/auth.js';
 import { body, validationResult } from 'express-validator';
