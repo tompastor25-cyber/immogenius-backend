@@ -1,8 +1,11 @@
 // Connexion Prisma et gestion de la base de données
 
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 
-const prismaClientSingleton = () => {
+const prisma = new PrismaClient();
+
+export default prisma;
+
   return new PrismaClient({
     log: process.env.LOG_LEVEL === 'debug' ? ['query', 'error', 'warn'] : ['error']
   });
