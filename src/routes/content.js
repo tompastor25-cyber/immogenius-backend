@@ -2,7 +2,7 @@
 
 import express from 'express';
 import { authenticateToken, requireValidPlan, rateLimitPerUser } from '../middleware/auth.js';
-import { prisma } from '../utils/db.js';
+import  prisma  from '../utils/db.js';
 import * as openaiService from '../services/openai.js';
 import { body, validationResult } from 'express-validator';
 
