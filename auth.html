@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connexion / Inscription - Immo Genius</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    /* Styles spécifiques pour la page auth */
+    .auth-container {
+      display: flex;
+      gap: 48px;
+      align-items: stretch;
+      margin: 60px auto;
+      max-width: 1200px;
+    }
+
+    .auth-image {
+      flex: 1;
+      background: linear-gradient(135deg, var(--primary) 0%, #0f2a3b 100%);
+      border-radius: var(--radius);
+      padding: 48px;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .auth-image h2 {
+      color: white;
+      margin-bottom: 24px;
+      font-size: 32px;
+    }
+
+    .auth-image p {
+      color: #e0e7ff;
+      line-height: 1.8;
+      margin-bottom: 20px;
+    }
+
+    .auth-image ul {
+      list-style: none;
+      margin-top: 32px;
+    }
+
+    .auth-image li {
+      color: #cbd5e1;
+      margin-bottom: 16px;
+      padding-left: 28px;
+      position: relative;
+    }
+
+    .auth-image li:before {
+      content: "✓";
+      color: var(--accent);
+      font-weight: bold;
+      position: absolute;
+      left: 0;
+    }
+
+    .auth-form {
+      flex: 1;
+      padding: 48px;
+      background-color: var(--light-bg);
+      border-radius: var(--radius);
+    }
+
+    .auth-form h1 {
+      color: var(--primary);
+      margin-bottom: 8px;
+      font-size: 32px;
+    }
+
+    .auth-form .subtitle {
+      color: var(--text-light);
+      margin-bottom: 32px;
+    }
+
+    .auth-toggle {
+      text-align: center;
+      margin-top: 24px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+    }
+
+    .auth-toggle a {
+      color: var(--secondary);
+      text-decoration: none;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .auth-toggle a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+      .auth-container {
+        flex-direction: column;
+        gap: 32px;
+        margin: 40px auto;
+      }
+
+      .auth-image {
+        padding: 32px;
+      }
+
+      .auth-form {
+        padding: 32px;
+      }
+
+      .auth-image h2 {
+        font-size: 24px;
+      }
+
+      .auth-form h1 {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================
+       HEADER / NAVIGATION (minimal)
+       ============================================ -->
+  <header>
+    <div class="container">
+      <nav>
+        <a href="index.html" class="logo">🏠 Immo Genius</a>
+
+        <button class="nav-toggle">☰</button>
+
+        <ul class="nav-links">
+          <li><a href="features.html">Fonctionnalités</a></li>
+          <li><a href="pricing.html">Tarifs</a></li>
+          <li><a href="faq.html">FAQ</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ============================================
+       AUTH SECTION
+       ============================================ -->
+  <section style="padding: 40px 0;">
+    <div class="container">
+
+      <div class="auth-container">
+
+        <!-- Colonne gauche: Image et bénéfices -->
+        <div class="auth-image">
+          <h2>Transformez votre quotidien immobilier</h2>
+          <p>Rejoignez des centaines d'agents immobiliers qui gagnent des heures chaque semaine avec Immo Genius.</p>
+
+          <ul>
+            <li>Génération d'annonces en quelques secondes</li>
+            <li>Messages clients automatisés</li>
+            <li>Posts réseaux sociaux optimisés</li>
+            <li>Support professionnel 24/7</li>
+            <li>7 jours gratuits, sans engagement</li>
+          </ul>
+
+          <p style="margin-top: 32px; font-size: 14px; color: #94a3b8;">
+            ✨ 100+ agents nous font confiance
+          </p>
+        </div>
+
+        <!-- Colonne droite: Formulaire -->
+        <div class="auth-form">
+          <h1 id="authTitle">Se connecter</h1>
+          <p class="subtitle">Accédez à votre compte Immo Genius</p>
+
+          <form id="authForm">
+
+            <!-- Groupe nom (caché par défaut, visible en inscription) -->
+            <div class="form-group" id="nameGroup" style="display: none;">
+              <label for="authName">Nom complet</label>
+              <input type="text" id="authName" name="name" placeholder="Votre nom">
+            </div>
+
+            <!-- Email -->
+            <div class="form-group">
+              <label for="authEmail">Email</label>
+              <input
+                type="email"
+                id="authEmail"
+                name="email"
+                placeholder="votre@email.com"
+                required
+              >
+            </div>
+
+            <!-- Mot de passe -->
+            <div class="form-group">
+              <label for="authPassword">Mot de passe</label>
+              <input
+                type="password"
+                id="authPassword"
+                name="password"
+                placeholder="Minimum 6 caractères"
+                required
+              >
+            </div>
+
+            <!-- Confirmation mot de passe (caché par défaut) -->
+            <div class="form-group" id="passwordConfirmGroup" style="display: none;">
+              <label for="authPasswordConfirm">Confirmer le mot de passe</label>
+              <input
+                type="password"
+                id="authPasswordConfirm"
+                name="passwordConfirm"
+                placeholder="Confirmez votre mot de passe"
+              >
+            </div>
+
+            <!-- Bouton submit -->
+            <button type="submit" id="submitAuth" class="btn btn-primary" style="width: 100%; font-size: 16px; padding: 14px;">
+              Se connecter
+            </button>
+
+            <!-- Lien inscription/connexion -->
+            <div class="auth-toggle">
+              <span style="color: var(--text-light);">Pas encore de compte ? </span>
+              <a href="#" id="toggleAuth">S'inscrire</a>
+            </div>
+
+          </form>
+
+          <!-- Options supplémentaires -->
+          <div style="margin-top: 32px; text-align: center; color: var(--text-light); font-size: 14px;">
+            <p>Ou continuez avec</p>
+            <div style="display: flex; gap: 12px; justify-content: center; margin-top: 12px;">
+              <button
+                id="googleBtn"
+                type="button"
+                style="
+                  background-color: white;
+                  border: 1px solid var(--border);
+                  padding: 12px 24px;
+                  border-radius: var(--radius);
+                  cursor: pointer;
+                  font-weight: 600;
+                  color: var(--text-dark);
+                  transition: all 0.3s ease;
+                "
+                onmouseover="this.style.backgroundColor='#f8f9fa'"
+                onmouseout="this.style.backgroundColor='white'">
+                🔵 Google
+              </button>
+              <button
+                id="microsoftBtn"
+                type="button"
+                style="
+                  background-color: white;
+                  border: 1px solid var(--border);
+                  padding: 12px 24px;
+                  border-radius: var(--radius);
+                  cursor: pointer;
+                  font-weight: 600;
+                  color: var(--text-dark);
+                  transition: all 0.3s ease;
+                "
+                onmouseover="this.style.backgroundColor='#f8f9fa'"
+                onmouseout="this.style.backgroundColor='white'">
+                🏢 Microsoft
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============================================
+       FAQ RAPIDE
+       ============================================ -->
+  <section class="light-bg">
+    <div class="container">
+      <h2 class="text-center">Vous avez des questions avant de vous inscrire ?</h2>
+
+      <div class="accordion" style="max-width: 800px; margin: 48px auto 0;">
+
+        <div class="accordion-item">
+          <div class="accordion-header">
+            <span>Puis-je vraiment essayer gratuitement sans carte bancaire ?</span>
+            <span class="accordion-icon">▼</span>
+          </div>
+          <div class="accordion-content">
+            <p>Oui, c'est garanti. Créez votre compte avec juste un email et un mot de passe. Vous avez 7 jours complets pour explorer et tester Immo Genius. Pas de formulaire bancaire à remplir, pas de frais cachés. Après 7 jours, vous choisissez un plan payant ou votre compte bascule en lecture seule.</p>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <div class="accordion-header">
+            <span>Mes données sont-elles sécurisées ?</span>
+            <span class="accordion-icon">▼</span>
+          </div>
+          <div class="accordion-content">
+            <p>Oui. Vos données sont chiffrées (TLS/SSL), stockées en France (RGPD), et sauvegardes régulièrement. Nous n'accédons jamais à vos contenus sans permission. Vous pouvez activer l'authentification à deux facteurs (2FA) pour plus de sécurité.</p>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <div class="accordion-header">
+            <span>Je m'inscris seul ou en équipe ?</span>
+            <span class="accordion-icon">▼</span>
+          </div>
+          <div class="accordion-content">
+            <p>Vous créez d'abord un compte personnel. Si vous êtes agent indépendant, c'est bon. Si vous êtes en agence, vous pouvez ensuite inviter vos collègues (plan Agence jusqu'à 5 personnes, Pro+ illimité). Chacun a son propre login et ses sièges gérés par vous.</p>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <div class="accordion-header">
+            <span>Que se passe-t-il si j'oublie mon mot de passe ?</span>
+            <span class="accordion-icon">▼</span>
+          </div>
+          <div class="accordion-content">
+            <p>Cliquez sur "Mot de passe oublié" (visible après le formulaire) et entrez votre email. Vous recevrez un lien de réinitialisation en quelques minutes. Ce lien est valide 24h. Si vous ne le recevez pas, vérifiez votre dossier spam.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================
+       CTA FOOTER
+       ============================================ -->
+  <section style="background: linear-gradient(135deg, var(--primary) 0%, #0f2a3b 100%); color: white; text-align: center;">
+    <div class="container">
+      <p style="margin: 0; color: #cbd5e1;">
+        En vous inscrivant, vous acceptez nos <a href="#" style="color: var(--accent); text-decoration: none;">conditions d'utilisation</a> et <a href="#" style="color: var(--accent); text-decoration: none;">politique de confidentialité</a>.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============================================
+       FOOTER
+       ============================================ -->
+  <footer>
+    <div class="container">
+      <div class="grid">
+        <div>
+          <h4>Immo Genius</h4>
+          <p style="color: #cbd5e1; margin-bottom: 16px;">L'IA pour les professionnels de l'immobilier.</p>
+        </div>
+
+        <div>
+          <h4>Produit</h4>
+          <a href="features.html">Fonctionnalités</a>
+          <a href="pricing.html">Tarifs</a>
+          <a href="faq.html">FAQ</a>
+        </div>
+
+        <div>
+          <h4>Légal</h4>
+          <a href="#">Conditions d'utilisation</a>
+          <a href="#">Politique de confidentialité</a>
+          <a href="#">Mentions légales</a>
+        </div>
+
+        <div>
+          <h4>Support</h4>
+          <a href="contact.html">Nous contacter</a>
+          <a href="#">Centre d'aide</a>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        Développé pour les professionnels de l'immobilier | Version 1.0
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/script.js"></script>
+</body>
+</html>

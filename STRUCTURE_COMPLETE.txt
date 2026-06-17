@@ -1,0 +1,396 @@
+
+═══════════════════════════════════════════════════════════════════════════════
+                     📁 STRUCTURE COMPLÈTE DU PROJET
+                            Immo Genius SaaS
+═══════════════════════════════════════════════════════════════════════════════
+
+immo-genius/
+│
+├── 🌐 PAGES HTML (Frontend)
+│   ├── index.html .......................... Page d'accueil (hero + benefits)
+│   ├── features.html ....................... Détail des modules IA
+│   ├── pricing.html ........................ Tarifs avec plans
+│   ├── faq.html ............................ FAQ et accordions
+│   ├── contact.html ........................ Formulaire contact
+│   ├── auth.html ........................... Connexion/Inscription
+│   └── auth-callback.html .................. Callback OAuth
+│
+├── 🎨 STYLES & SCRIPTS
+│   ├── css/
+│   │   └── styles.css ...................... Design complet (responsive)
+│   └── js/
+│       └── script.js ....................... Logique interactive
+│
+├── 🔧 SERVER & CONFIG
+│   ├── server.js ........................... Serveur Express (200+ lignes)
+│   ├── package.json ........................ Dépendances npm
+│   ├── .env ................................ Variables d'environnement
+│   └── .env.example ........................ Template .env
+│
+├── 🗄️ BASE DE DONNÉES (Prisma)
+│   └── prisma/
+│       ├── schema.prisma ................... Schéma complet (8 tables)
+│       └── .env (référencé)
+│
+├── 🔐 AUTHENTIFICATION
+│   └── src/middleware/
+│       └── auth.js ......................... JWT + Rate limiting
+│
+├── 🛣️ ROUTES API
+│   └── src/routes/
+│       ├── auth.js ......................... Routes authentification (6)
+│       ├── content.js ...................... Routes génération IA (7)
+│       └── payment.js ...................... Routes Stripe (6)
+│
+├── 🤖 SERVICES (OpenAI, Stripe)
+│   └── src/services/
+│       ├── openai.js ....................... Service génération IA
+│       └── stripe.js ....................... Service paiements
+│
+├── 💾 UTILITAIRES
+│   └── src/utils/
+│       ├── db.js ........................... Client Prisma
+│       └── jwt.js .......................... Helpers JWT
+│
+├── 🚀 SCRIPTS
+│   └── scripts/
+│       └── setupDb.js ...................... Setup initial base de données
+│
+├── 📚 DOCUMENTATION
+│   ├── GETTING_STARTED.md .................. ⭐ Démarrage rapide (LIRE EN PREMIER)
+│   ├── BACKEND_COMPLETE.md ................ Vue d'ensemble backend
+│   ├── DEPLOYMENT.md ....................... Guide déploiement production
+│   ├── OAUTH_SETUP.md ...................... Config Google/Microsoft
+│   ├── CLAUDE.md ........................... Notes internes + roadmap
+│   ├── README.md ........................... Infos générales
+│   ├── ✅_TOUS_LES_FICHIERS_CRÉES.txt .... Récapitulatif fichiers
+│   ├── STRUCTURE_COMPLETE.txt ............. Ce fichier
+│   └── INSTALLATION_COMPLETE.txt ......... Info installation
+│
+├── 🔒 SÉCURITÉ
+│   └── .gitignore .......................... Ignorer les fichiers sensibles
+│
+└── 📦 PACKAGE & DÉPENDANCES
+    └── node_modules/ (créé après npm install)
+
+
+═══════════════════════════════════════════════════════════════════════════════
+                           STRUCTURE DES ROUTES API
+═══════════════════════════════════════════════════════════════════════════════
+
+BASE URL: http://localhost:3000
+
+🔐 AUTHENTIFICATION (/api/auth)
+├── POST   /signup .......................... Inscription
+├── POST   /login ........................... Connexion
+├── POST   /logout .......................... Déconnexion
+├── GET    /me ............................. Récupérer profil
+├── PUT    /profile ......................... Éditer profil
+└── POST   /change-password ................. Changer mot de passe
+
+📝 GÉNÉRATION CONTENU (/api/content)
+├── POST   /generate-listing ............... Générer annonce immobilière
+├── POST   /generate-message ............... Générer message client
+├── POST   /generate-social ................ Générer post réseaux
+├── POST   /generate-estimation ............ Générer estimation prix
+├── GET    /history ......................... Voir historique
+├── GET    /:id ............................ Voir détail contenu
+└── DELETE /:id ............................ Supprimer contenu
+
+💳 PAIEMENTS (/api/payment)
+├── POST   /create-checkout-session ........ Créer session Stripe
+├── GET    /checkout-session/:id ........... Détails session
+├── POST   /webhook ......................... Webhook Stripe (sécurisé)
+├── GET    /invoices ........................ Lister factures
+├── POST   /cancel-subscription ............ Annuler abonnement
+└── GET    /subscription-status ............ Voir statut abonnement
+
+✅ HEALTH
+└── GET    /api/health ..................... État du serveur
+
+
+═══════════════════════════════════════════════════════════════════════════════
+                         STRUCTURE DE LA BASE DE DONNÉES
+═══════════════════════════════════════════════════════════════════════════════
+
+PostgreSQL Database: immogenius
+
+📊 TABLES PRINCIPALES:
+
+users
+├── id (CUID)
+├── email (UNIQUE)
+├── name
+├── passwordHash
+├── structure (independent | agency | network)
+├── plan (free_trial | solo | agency | pro_plus)
+├── subscriptionId (Stripe)
+├── subscriptionStart
+├── subscriptionEnd
+├── trialEnd
+├── generationsUsed
+├── googleId
+├── microsoftId
+├── isAdmin
+├── isActive
+├── createdAt
+└── updatedAt
+
+generated_content
+├── id (CUID)
+├── userId (FK → users)
+├── type (listing | message | social_post | report | estimation | review_response | contract)
+├── originalInput (TEXT)
+├── generatedOutput (TEXT)
+├── style
+├── platform (instagram | facebook | linkedin | etc)
+├── tokens (OpenAI usage)
+├── cost ($ spent)
+├── isFavorite
+├── isUsed
+├── createdAt
+└── updatedAt
+
+billing_history
+├── id (CUID)
+├── userId (FK → users)
+├── stripeInvoiceId
+├── amount
+├── currency
+├── status (pending | paid | failed)
+├── billingPeriod
+├── dueDate
+├── createdAt
+└── updatedAt
+
+stripe_events
+├── id (CUID)
+├── stripeEventId (UNIQUE)
+├── type (event type)
+├── data (JSON)
+├── processed
+└── createdAt
+
+contact_messages
+├── id (CUID)
+├── userId (FK → users, nullable)
+├── name
+├── email
+├── phone
+├── structure
+├── message (TEXT)
+├── status (new | in_progress | resolved)
+├── assignedTo
+├── response (TEXT)
+├── createdAt
+└── updatedAt
+
+team_member
+├── id (CUID)
+├── userId (FK → users)
+├── role (admin | editor | viewer)
+├── createdAt
+└── updatedAt
+
+api_key
+├── id (CUID)
+├── userId (FK → users)
+├── name
+├── key (UNIQUE)
+├── secret (hashed)
+├── scopes
+├── lastUsed
+├── isActive
+├── createdAt
+└── updatedAt
+
+audit_log
+├── id (CUID)
+├── userId (nullable)
+├── action (login | signup | generate | subscribe | etc)
+├── resource
+├── resourceId
+├── changes (JSON)
+├── ipAddress
+├── userAgent
+└── createdAt
+
+
+═══════════════════════════════════════════════════════════════════════════════
+                            ARCHITECTURE GLOBALE
+═══════════════════════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           CLIENT (BROWSER)                                  │
+│                                                                             │
+│  ┌─────────────────┐  ┌──────────────────┐  ┌────────────────────────┐    │
+│  │   index.html    │  │  features.html   │  │   pricing.html        │    │
+│  └─────────────────┘  └──────────────────┘  └────────────────────────┘    │
+│                                                                             │
+│  ┌──────────────────┐  ┌──────────────────┐  ┌────────────────────────┐   │
+│  │    faq.html      │  │  contact.html    │  │     auth.html         │    │
+│  └──────────────────┘  └──────────────────┘  └────────────────────────┘   │
+│                                                                             │
+│  JavaScript: script.js (formulaires, toggles, accordions)                  │
+│  CSS: styles.css (responsive, design moderne)                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                  ↕ HTTP(S)
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    NODE.JS/EXPRESS SERVER (server.js)                       │
+│                                                                             │
+│  Middleware: ┌─────────────┬──────────────┬──────────────┐                │
+│              │   CORS      │   Helmet     │ JSON Parser  │                │
+│              └─────────────┴──────────────┴──────────────┘                │
+│                                                                             │
+│  Authentication: ┌─────────────────────────────────────────────────────┐   │
+│                  │ JWT verification, Rate limiting, Audit logging      │   │
+│                  └─────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  Routes:   ┌──────────┬──────────────┬─────────────┐                       │
+│            │  /auth   │  /content    │  /payment   │                       │
+│            └──────────┴──────────────┴─────────────┘                       │
+│                          ↓
+│            Services: ┌─────────────┬──────────────┐
+│                      │   OpenAI    │   Stripe     │
+│                      └─────────────┴──────────────┘
+└─────────────────────────────────────────────────────────────────────────────┘
+                         ↓        ↓            ↓
+        ┌────────────────────┴──────────┴──────────────────┐
+        │                                                  │
+    ┌───▼────────┐               ┌────────────────┐   ┌──▼───────┐
+    │ PostgreSQL │               │   OpenAI API   │   │ Stripe   │
+    │ (Prisma)   │               │   (GPT-4/3.5)  │   │   API    │
+    └────────────┘               └────────────────┘   └──────────┘
+    • Users                       • Listings
+    • Generated Content          • Messages
+    • Billing                    • Posts
+    • Audit Logs                 • Estimations
+
+
+═══════════════════════════════════════════════════════════════════════════════
+                         FLUX DE DONNÉES PRINCIPAL
+═══════════════════════════════════════════════════════════════════════════════
+
+1. AUTHENTIFICATION
+   User submits email/password
+        ↓
+   server.js validates input
+        ↓
+   src/routes/auth.js processes signup/login
+        ↓
+   bcryptjs hashes password
+        ↓
+   Prisma saves to PostgreSQL
+        ↓
+   src/utils/jwt.js generates token
+        ↓
+   Token returned to client
+
+2. GÉNÉRATION IA
+   User submits property details
+        ↓
+   server.js checks JWT authentication
+        ↓
+   src/routes/content.js receives request
+        ↓
+   Rate limiter checks limit (10/hour)
+        ↓
+   src/services/openai.js calls OpenAI API
+        ↓
+   Generated content returned
+        ↓
+   Prisma saves to generated_content table
+        ↓
+   Result returned to client
+
+3. PAIEMENT
+   User clicks "Subscribe"
+        ↓
+   src/routes/payment.js creates checkout session
+        ↓
+   Stripe.createCheckoutSession() returns URL
+        ↓
+   User redirected to Stripe
+        ↓
+   User completes payment
+        ↓
+   Stripe webhook calls /api/payment/webhook
+        ↓
+   src/services/stripe.js handles webhook
+        ↓
+   Prisma updates user subscription
+        ↓
+   User granted access to premium features
+
+
+═══════════════════════════════════════════════════════════════════════════════
+                            FICHIERS PAR TAILLE
+═══════════════════════════════════════════════════════════════════════════════
+
+server.js ........................ 200+ lignes (serveur principal)
+src/routes/content.js ........... 300+ lignes (API génération)
+src/services/openai.js ......... 350+ lignes (service OpenAI)
+src/services/stripe.js ......... 300+ lignes (service Stripe)
+src/routes/payment.js .......... 200+ lignes (API paiements)
+src/routes/auth.js ............ 200+ lignes (API authentification)
+prisma/schema.prisma .......... 300+ lignes (schéma BD)
+css/styles.css ................. 1000+ lignes (styles complets)
+js/script.js ................... 600+ lignes (logique frontend)
+DEPLOYMENT.md .................. 400+ lignes (guide déploiement)
+GETTING_STARTED.md ............ 300+ lignes (guide démarrage)
+OAUTH_SETUP.md ................ 300+ lignes (config OAuth)
+README.md ...................... 400+ lignes (doc générale)
+BACKEND_COMPLETE.md ........... 300+ lignes (vue d'ensemble)
+
+Total: ~10 000 lignes de code et documentation
+
+
+═══════════════════════════════════════════════════════════════════════════════
+                         FLUX D'UTILISATION TYPIQUE
+═══════════════════════════════════════════════════════════════════════════════
+
+1. UTILISATEUR NOUVEAU
+   ├─ Visite http://localhost:3000
+   ├─ Clique sur "Essayer gratuitement"
+   ├─ Remplit le formulaire d'inscription (auth.html)
+   ├─ POST /api/auth/signup
+   ├─ Reçoit un JWT token
+   ├─ Redirigé vers le dashboard (page d'accueil)
+   └─ Trial de 7 jours activé
+
+2. UTILISATION
+   ├─ Remplir les détails du bien
+   ├─ Cliquer "Générer l'annonce"
+   ├─ POST /api/content/generate-listing
+   ├─ OpenAI génère le contenu
+   ├─ Affichage du résultat
+   ├─ Historique sauvegardé en BD
+   └─ Compteur de générations incrémenté
+
+3. PAIEMENT
+   ├─ Trial expire (7 jours)
+   ├─ Voir page pricing
+   ├─ Cliquer "Commencer"
+   ├─ POST /api/payment/create-checkout-session
+   ├─ Redirection vers Stripe Checkout
+   ├─ Paiement complété
+   ├─ Webhook reçu (Stripe → server)
+   ├─ Abonnement activé en BD
+   └─ Accès complet déverrouillé
+
+4. GESTION DU COMPTE
+   ├─ Voir le profil
+   ├─ Voir l'historique
+   ├─ Voir les factures
+   ├─ Annuler l'abonnement
+   └─ Se déconnecter
+
+
+═══════════════════════════════════════════════════════════════════════════════
+
+                            🎉 PROJECT COMPLET! 🎉
+
+                Vous avez un SaaS professionnel et fonctionnel
+                     Prêt pour la production!
+
+═══════════════════════════════════════════════════════════════════════════════
