@@ -1,0 +1,262 @@
+// Immo Genius - Database Schema (Prisma + PostgreSQL)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// USERS
+// ============================================
+
+model User {
+  id                String      @id @default(cuid())
+  email             String      @unique
+  name              String
+  passwordHash      String
+
+  // Profil
+  structure         Structure   @default(independent)  // independent, agency, network
+  phone             String?
+  avatar            String?
+
+  // Subscription
+  plan              Plan        @default(free_trial)   // free_trial, solo, agency, pro_plus
+  subscriptionId    String?     @unique                // Stripe subscription ID
+  subscriptionStart DateTime?
+  subscriptionEnd   DateTime?
+
+  // Trial tracking
+  trialStart        DateTime    @default(now())
+  trialEnd          DateTime?
+  generationsUsed   Int         @default(0)
+
+  // OAuth
+  googleId          String?     @unique
+  microsoftId       String?     @unique
+
+  // Admin
+  isAdmin           Boolean     @default(false)
+  isActive          Boolean     @default(true)
+
+  // Timestamps
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  lastLogin         DateTime?
+
+  // Relations
+  teamMembers       TeamMember[]
+  generatedContent  GeneratedContent[]
+  contactMessages   ContactMessage[]
+  apiKeys           ApiKey[]
+  billingHistory    BillingHistory[]
+
+  @@index([email])
+  @@index([subscriptionId])
+  @@map("users")
+}
+
+enum Structure {
+  independent  // Agent indépendant
+  agency       // Agence immobilière
+  network      // Réseau immobilier
+}
+
+enum Plan {
+  free_trial   // 7 jours gratuit
+  solo         // 39€/mois
+  agency       // 99€/mois
+  pro_plus     // Sur devis
+}
+
+// ============================================
+// TEAM & COLLABORATION
+// ============================================
+
+model TeamMember {
+  id        String   @id @default(cuid())
+  userId    String
+  role      String   @default("member")  // admin, editor, viewer
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId])
+  @@map("team_members")
+}
+
+// ============================================
+// GENERATED CONTENT
+// ============================================
+
+model GeneratedContent {
+  id              String    @id @default(cuid())
+  userId          String
+
+  // Contenu généré
+  type            ContentType
+  originalInput   String    @db.Text
+  generatedOutput String    @db.Text
+  style           String    @default("professional")
+  platform        String?   // instagram, facebook, linkedin, email, whatsapp
+  variant         String?   // long, short, title, etc.
+
+  // Métadonnées
+  tokens          Int       @default(0)  // OpenAI tokens used
+  cost            Float     @default(0)  // Coût OpenAI en $
+
+  // Statut
+  isFavorite      Boolean   @default(false)
+  isUsed          Boolean   @default(false)  // Publié ou envoyé
+
+  // Timestamps
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([type])
+  @@index([createdAt])
+  @@map("generated_content")
+}
+
+enum ContentType {
+  listing          // Annonce immobilière
+  message          // Message client (SMS, email, WhatsApp)
+  social_post      // Post réseaux sociaux
+  report           // Rapport de visite
+  estimation       // Estimation de prix
+  review_response  // Réponse aux avis
+  contract         // Contrat simple
+}
+
+// ============================================
+// CONTACT & SUPPORT
+// ============================================
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  userId    String?
+
+  // Données du contact
+  name      String
+  email     String
+  phone     String?
+  structure String?  // independent, agency, network
+  message   String   @db.Text
+
+  // Support
+  status    String   @default("new")  // new, in_progress, resolved
+  assignedTo String?
+  response  String?  @db.Text
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([email])
+  @@index([status])
+  @@map("contact_messages")
+}
+
+// ============================================
+// BILLING & PAYMENTS
+// ============================================
+
+model BillingHistory {
+  id              String   @id @default(cuid())
+  userId          String
+
+  // Payment details
+  stripeInvoiceId String?  @unique
+  amount          Float
+  currency        String   @default("EUR")
+  status          String   @default("pending")  // pending, paid, failed
+
+  // Billing period
+  billingPeriod   DateTime
+  dueDate         DateTime
+
+  // Timestamps
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@map("billing_history")
+}
+
+model StripeEvent {
+  id              String   @id @default(cuid())
+  stripeEventId   String   @unique
+  type            String
+  data            Json
+  processed       Boolean  @default(false)
+
+  createdAt       DateTime @default(now())
+
+  @@index([stripeEventId])
+  @@map("stripe_events")
+}
+
+// ============================================
+// API & INTEGRATIONS
+// ============================================
+
+model ApiKey {
+  id        String   @id @default(cuid())
+  userId    String
+
+  name      String
+  key       String   @unique
+  secret    String   // Hashed
+
+  // Permissions
+  scopes    String[] @default([])  // read:content, write:content, etc.
+
+  // Usage
+  lastUsed  DateTime?
+  isActive  Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("api_keys")
+}
+
+// ============================================
+// AUDIT & LOGS
+// ============================================
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+
+  action    String   // login, generate_content, subscribe, etc.
+  resource  String?  // User, Content, etc.
+  resourceId String?
+  changes   Json?    // Quelles données ont changé
+
+  ipAddress String?
+  userAgent String?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@map("audit_logs")
+}
