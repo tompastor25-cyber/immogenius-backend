@@ -1,7 +1,7 @@
 // Service Stripe pour les paiements et abonnements
 
 import Stripe from 'stripe';
-import { prisma } from '../utils/db.js';
+import  prisma  from '../utils/db.js';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
